@@ -87,6 +87,14 @@ var (
 			Max: image.Point{X: 7, Y: 6},
 		},
 	}
+
+	rectangleK = geometry.Rectangle{
+		Name: "K",
+		Inner: image.Rectangle{
+			Min: image.Point{X: -5, Y: 5},
+			Max: image.Point{X: -3, Y: 7},
+		},
+	}
 )
 
 type rectangleTuple struct {
@@ -251,12 +259,76 @@ func TestRectangle_Intersects(t *testing.T) {
 			rectangleTuple{rectangleF, rectangleG},
 			true,
 		},
+		{
+			rectangleTuple{rectangleK, rectangleJ},
+			true,
+		},
 	}
 
 	for _, tt := range computations {
 		result := tt.tuple.r1.Intersects(tt.tuple.r2)
 		if result != tt.result {
 			t.Fatalf("TestRectangle_Intersects: expected: %t, found: %t", tt.result, result)
+		}
+	}
+}
+
+func TestRectangle_IntersectionPoints(t *testing.T) {
+	var computations = []struct {
+		tuple  rectangleTuple
+		result []geometry.Point
+	}{
+		{
+			rectangleTuple{rectangleK, rectangleJ},
+			[]geometry.Point{
+				{X: -4, Y: 5},
+				{X: -3, Y: 6},
+			},
+		},
+		{
+			rectangleTuple{rectangleJ, rectangleK},
+			[]geometry.Point{
+				{X: -4, Y: 5},
+				{X: -3, Y: 6},
+			},
+		},
+		{
+			rectangleTuple{rectangleF, rectangleG},
+			[]geometry.Point{
+				{X: -3, Y: -4},
+				{X: -3, Y: -3},
+				{X: -2, Y: -4},
+				{X: -2, Y: -3},
+			},
+		},
+		{
+			rectangleTuple{rectangleG, rectangleF},
+			[]geometry.Point{
+				{X: -3, Y: -4},
+				{X: -3, Y: -3},
+				{X: -2, Y: -4},
+				{X: -2, Y: -3},
+			},
+		},
+		{
+			rectangleTuple{rectangleH, rectangleI},
+			[]geometry.Point{},
+		},
+		{
+			rectangleTuple{rectangleA, rectangleB},
+			[]geometry.Point{},
+		},
+	}
+
+	for _, tt := range computations {
+		result := tt.tuple.r1.IntersectionPoints(tt.tuple.r2)
+		if len(result) != len(tt.result) {
+			t.Fatalf("TestRectangle_IntersectionPoints: expected size: %d, found: %d", len(tt.result), len(result))
+		}
+		for i := 0; i < len(result); i++ {
+			if result[i] != tt.result[i] {
+				t.Fatalf("TestRectangle_IntersectionPoints: expected: %+v, found: %+v", tt.result[i], result[i])
+			}
 		}
 	}
 }

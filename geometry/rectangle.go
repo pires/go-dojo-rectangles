@@ -4,15 +4,10 @@ import (
 	"image"
 )
 
-type point struct {
-	X int `json:"x"`
-	Y int `json:"y"`
-}
-
 type Rectangle struct {
 	Name string
-	P1   point `json: p1`
-	P2   point `json: p2`
+	P1   Point `json: p1`
+	P2   Point `json: p2`
 
 	Inner image.Rectangle `json:"-"`
 }
@@ -50,6 +45,33 @@ func (this Rectangle) IsContainedIn(that Rectangle) bool {
 // Intersects whether this rectangle intersects that rectangle.
 func (this Rectangle) Intersects(that Rectangle) bool {
 	return this.Inner.Overlaps(that.Inner) && (!this.Contains(that) && !this.IsContainedIn(that))
+}
+
+// IntersectionPoints returns an array of intersection points.
+func (this Rectangle) IntersectionPoints(that Rectangle) (intersectionPoints []Point) {
+	// Evaluate intersection
+	if this.Intersects(that) {
+		// Get intersection result, a new rectangle
+		intersectionRectangle := this.Inner.Intersect(that.Inner)
+		// If rectangles intersect, the intersectionRectangle is not empty but it doesn't hurt to double check
+		if !intersectionRectangle.Eq(image.ZR) {
+			// Get intersectionRectangle vertices
+			vertices := []Point{
+				{X: intersectionRectangle.Min.X, Y: intersectionRectangle.Min.Y},
+				{X: intersectionRectangle.Min.X, Y: intersectionRectangle.Max.Y},
+				{X: intersectionRectangle.Max.X, Y: intersectionRectangle.Min.Y},
+				{X: intersectionRectangle.Max.X, Y: intersectionRectangle.Max.Y},
+			}
+			// Return only intersection points that share both rectangles lines.
+			for _, vertice := range vertices {
+				if !(vertice.ContainedButNotInLine(this) || vertice.ContainedButNotInLine(that)) {
+					intersectionPoints = append(intersectionPoints, vertice)
+				}
+			}
+		}
+	}
+
+	return
 }
 
 // IsAdjacent whether this rectangle is adjacent with that rectangle.

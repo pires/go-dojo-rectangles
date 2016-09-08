@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"flag"
+	"fmt"
 	"image"
 	"io"
 	"os"
@@ -192,7 +193,25 @@ func main() {
 	sort.Strings(rectanglesKeys)
 
 	// Render
+	println()
 	computeIntersectionsTable().Render()
+
+	for _, name1 := range rectanglesKeys {
+		// Print rectangle name
+		for _, name2 := range rectanglesKeys {
+			if name1 != name2 {
+				rectangle1 := rectangles[name1]
+				rectangle2 := rectangles[name2]
+				if rectangle1.Intersects(rectangle2) {
+					fmt.Printf("%+v \n", rectangle1.IntersectionPoints(rectangle2))
+				}
+			}
+		}
+	}
+
+	println()
 	computeContainsTable().Render()
+	println()
 	computeIsAdjacentTable().Render()
+	println()
 }

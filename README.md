@@ -10,7 +10,7 @@ This application loads rectangular polygons from a JSON file and prints the resu
 This repository already provides executables for Linux, MacOS and Windows in the `binaries` folder. So,
 if you're running Windows 64-bit, you should execute:
 ```
-./binaries/rectangles_win64 -json testdata/valid.json
+./binaries/rectangles_win64.exe -json testdata/valid.json
 ```
 
 Based on `testdata/valid.json` (see the image below for a depiction of the JSON data), the output should look like:

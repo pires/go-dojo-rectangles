@@ -9,16 +9,9 @@ import (
 	"io"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/pires/go-dojo-rectangles/geometry"
-
-	"github.com/olekukonko/tablewriter"
-)
-
-const (
-	yes           = "X"
-	no            = ""
-	notApplicable = "-"
 )
 
 var (
@@ -74,106 +67,6 @@ func loadRectanglesFromJSONFile(filepath string) (map[string]geometry.Rectangle,
 	return loadRectanglesFromJSON(file)
 }
 
-// computeIntersectionsTable computes intersections and returns results formatted as an ASCII table.
-func computeIntersectionsTable() (table *tablewriter.Table) {
-	table = newTable("Intersects?")
-	// Matrix values
-	for _, name1 := range rectanglesKeys {
-		// Print rectangle name
-		row := make([]string, 0, len(rectanglesKeys)+1)
-		row = append(row, name1)
-		for _, name2 := range rectanglesKeys {
-			if name1 == name2 {
-				row = append(row, notApplicable)
-			} else {
-				rectangle1 := rectangles[name1]
-				rectangle2 := rectangles[name2]
-
-				if rectangle1.Intersects(rectangle2) {
-					row = append(row, yes)
-				} else {
-					row = append(row, no)
-				}
-			}
-		}
-		table.Append(row)
-	}
-
-	return
-}
-
-// computeContainsTable computes contains and returns results formatted an ASCII table.
-func computeContainsTable() (table *tablewriter.Table) {
-	table = newTable("Contains?")
-	// Matrix values
-	for _, name1 := range rectanglesKeys {
-		// Print rectangle name
-		row := make([]string, 0, len(rectanglesKeys)+1)
-		row = append(row, name1)
-		for _, name2 := range rectanglesKeys {
-			if name1 == name2 {
-				row = append(row, notApplicable)
-			} else {
-				rectangle1 := rectangles[name1]
-				rectangle2 := rectangles[name2]
-
-				if rectangle1.Contains(rectangle2) {
-					row = append(row, yes)
-				} else {
-					row = append(row, no)
-				}
-			}
-		}
-		table.Append(row)
-	}
-
-	return
-}
-
-// computeIsAdjacentTable computes adjacency and returns results formatted an ASCII table.
-func computeIsAdjacentTable() (table *tablewriter.Table) {
-	table = newTable("Is Adjacent?")
-	// Matrix values
-	for _, name1 := range rectanglesKeys {
-		// Print rectangle name
-		row := make([]string, 0, len(rectanglesKeys)+1)
-		row = append(row, name1)
-		for _, name2 := range rectanglesKeys {
-			if name1 == name2 {
-				row = append(row, notApplicable)
-			} else {
-				rectangle1 := rectangles[name1]
-				rectangle2 := rectangles[name2]
-
-				if rectangle1.IsAdjacent(rectangle2) {
-					row = append(row, yes)
-				} else {
-					row = append(row, no)
-				}
-			}
-		}
-		table.Append(row)
-	}
-
-	return
-}
-
-// newTable returns a table ready to be populated.
-func newTable(op string) (table *tablewriter.Table) {
-	table = tablewriter.NewWriter(os.Stdout)
-	table.SetAlignment(tablewriter.ALIGN_CENTER)
-	table.SetRowLine(true)
-	// Matrix header
-	header := make([]string, 0, len(rectanglesKeys))
-	header = append(header, op)
-	for _, rectangleName := range rectanglesKeys {
-		header = append(header, rectangleName)
-	}
-	table.SetHeader(header)
-
-	return
-}
-
 func main() {
 	// Read flags
 	flag.Parse()
@@ -192,26 +85,51 @@ func main() {
 	}
 	sort.Strings(rectanglesKeys)
 
-	// Render
-	println()
-	computeIntersectionsTable().Render()
-
+	// Compute and process all rectangles
 	for _, name1 := range rectanglesKeys {
 		// Print rectangle name
+		fmt.Println(fmt.Sprintf("=> [%s]", name1))
+
+		// Iteratively build operation results
+		var intersects, contains, adjacents []string
+
+		// Perform calculations and append results
 		for _, name2 := range rectanglesKeys {
 			if name1 != name2 {
 				rectangle1 := rectangles[name1]
 				rectangle2 := rectangles[name2]
+
+				// Intersection
 				if rectangle1.Intersects(rectangle2) {
-					fmt.Printf("%+v \n", rectangle1.IntersectionPoints(rectangle2))
+					intersects = append(intersects, fmt.Sprintf("%s (intersection points: %+v)", rectangle2.Name, rectangle1.IntersectionPoints(rectangle2)))
+				}
+
+				// Containment
+				if rectangle1.Contains(rectangle2) {
+					contains = append(contains, rectangle2.Name)
+				}
+
+				// Adjacency
+				if rectangle1.IsAdjacent(rectangle2) {
+					adjacents = append(adjacents, rectangle2.Name)
 				}
 			}
 		}
-	}
 
-	println()
-	computeContainsTable().Render()
-	println()
-	computeIsAdjacentTable().Render()
-	println()
+		// If any operations didn't return results, pretty print.
+		if len(intersects) == 0 {
+			intersects = append(intersects, "None")
+		}
+		if len(contains) == 0 {
+			contains = append(contains, "None")
+		}
+		if len(adjacents) == 0 {
+			adjacents = append(adjacents, "None")
+		}
+
+		// Print results
+		fmt.Println(fmt.Sprintf("%s %s", "  => Intersects: ", strings.Join(intersects[:], ", ")))
+		fmt.Println(fmt.Sprintf("%s %s", "  => Contains: ", strings.Join(contains[:], ", ")))
+		fmt.Println(fmt.Sprintf("%s %s", "  => Is adjacent to: ", strings.Join(adjacents[:], ", ")))
+	}
 }

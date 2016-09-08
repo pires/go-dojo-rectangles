@@ -36,7 +36,7 @@ go run main.go -json testdata/valid.json
 
 ## Tests
 
-Package `rectangle` tests feed from `testdata/valid.json` file, which contains rectangles as depicted below.
+Package `geometry` tests feed from `testdata/valid.json` file, which contains rectangles as depicted below.
 You should use the image for an easier understanding of said tests.
 
 ![alt Rectangles](rectangles.jpg)

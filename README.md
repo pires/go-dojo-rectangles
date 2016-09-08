@@ -15,7 +15,7 @@ if you're running Windows 64-bit, you should execute:
 
 Based on `testdata/valid.json` (see the image below for a depiction of the JSON data), the output should look like:
  ```
- $ go run main.go -json testdata/valid.json
+go run main.go -json testdata/valid.json
  => [A]
    => Intersects:  None
    => Contains:  None
@@ -87,4 +87,7 @@ You should use the image for an easier understanding of said tests.
 
 ![alt Rectangles](rectangles.jpg)
 
-The aforementioned package **has 100% test coverage**.
+The aforementioned package **has 100% test coverage**. Here's how to run the testsuite:
+```
+go test -cover ./... -v
+```

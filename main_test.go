@@ -2,9 +2,10 @@ package main
 
 import (
 	"bytes"
-	"github.com/pires/apprenda/geometry"
 	"image"
 	"testing"
+
+	"github.com/pires/go-dojo-rectangles/geometry"
 )
 
 func TestParseJsonFile(t *testing.T) {

@@ -9,7 +9,7 @@ import (
 	"os"
 	"sort"
 
-	"github.com/pires/apprenda/geometry"
+	"github.com/pires/go-dojo-rectangles/geometry"
 
 	"github.com/olekukonko/tablewriter"
 )

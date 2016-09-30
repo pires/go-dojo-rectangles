@@ -1,9 +1,11 @@
 # go-dojo-rectangles
 
 This application loads rectangular polygons from a JSON file and prints the result of the following computations:
-* Intersection
-* Containment
-* Adjacency
+* **Intersection**
+* **Containment**
+* **Adjacency** - the sharing of a side. Side sharing may be proper or sub-line, 
+where a sub-line share is one where one side of rectangle A is a line that exists as a set of points wholly 
+contained on some other side of rectangle B.
 
 ## Usage
 
